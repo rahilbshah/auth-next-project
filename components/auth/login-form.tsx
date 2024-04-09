@@ -48,30 +48,32 @@ export const LoginForm = () => {
       login(values, callbackUrl)
         .then(data => {
           if (data?.error) {
-            // form.reset();
+            form.reset();
             setError(data.error);
           }
 
           if (data?.success) {
-            // form.reset();
+            form.reset();
             setSuccess(data.success);
           }
-          //
+          if (data?.twoFactor) {
+            setShowTwoFactor(true);
+          }
         })
         .catch(() => setError('Something went wrong'));
     });
   };
   return (
     <CardWrapper
-      headerLabel="Welcome back!"
+      headerLabel="Welcome back"
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/register"
       showSocial
     >
       <Form {...form}>
-        <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            {showTwoFactor ? (
+            {showTwoFactor && (
               <FormField
                 control={form.control}
                 name="code"
@@ -89,7 +91,8 @@ export const LoginForm = () => {
                   </FormItem>
                 )}
               />
-            ) : (
+            )}
+            {!showTwoFactor && (
               <>
                 <FormField
                   control={form.control}
@@ -101,7 +104,7 @@ export const LoginForm = () => {
                         <Input
                           {...field}
                           disabled={isPending}
-                          placeholder="user@example.com"
+                          placeholder="john.doe@example.com"
                           type="email"
                         />
                       </FormControl>
