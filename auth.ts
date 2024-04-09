@@ -1,12 +1,12 @@
-import NextAuth, { type DefaultSession } from 'next-auth';
+import NextAuth from 'next-auth';
+import { UserRole } from '@prisma/client';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 
 import { db } from '@/lib/db';
 import authConfig from '@/auth.config';
-import { getUserById } from './data/user';
-import { UserRole } from '@prisma/client';
+import { getUserById } from '@/data/user';
+import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation';
 import { getAccountByUserId } from './data/account';
-import { getTwoFactorConfirmationByUserId } from './data/two-factor-confirmation';
 
 export const {
   handlers: { GET, POST },
@@ -40,6 +40,7 @@ export const {
         const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
           existingUser.id,
         );
+
         if (!twoFactorConfirmation) return false;
 
         // Delete two factor confirmation for next sign in
@@ -54,6 +55,7 @@ export const {
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
@@ -61,11 +63,13 @@ export const {
       if (session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
+
       if (session.user) {
         session.user.name = token.name;
         session.user.email = token.email!;
         session.user.isOAuth = token.isOAuth as boolean;
       }
+
       return session;
     },
     async jwt({ token }) {
