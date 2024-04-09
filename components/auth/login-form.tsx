@@ -48,14 +48,15 @@ export const LoginForm = () => {
       login(values, callbackUrl)
         .then(data => {
           if (data?.error) {
-            form.reset();
+            // form.reset();
             setError(data.error);
           }
 
           if (data?.success) {
-            form.reset();
+            // form.reset();
             setSuccess(data.success);
           }
+          //
         })
         .catch(() => setError('Something went wrong'));
     });
